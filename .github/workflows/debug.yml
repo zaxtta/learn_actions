@@ -24,3 +24,5 @@ jobs:
         run: pwd
       - name: (after) git branch -a
         run: git branch -a
+      - name: (after) git log --name-only
+        run: git log --name-only
