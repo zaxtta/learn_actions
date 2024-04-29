@@ -1,0 +1,28 @@
+name: Debug Actions
+
+on:
+  push:
+
+jobs:
+  debug:
+    name: debug checkout actions
+    runs-on: ubuntu-latest
+    steps:
+      - name: (before) lsb_release -a
+        run: lsb_release -a
+      - name: (before) ls -la
+        run: ls -la
+      - name: (before) pwd
+        run: pwd
+      - name: (before) git branch -a
+        run: git branch -a
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: (after) lsb_release -a
+        run: lsb_release -a
+      - name: (after) ls -la
+        run: ls -la
+      - name: (after) pwd
+        run: pwd
+      - name: (after) git branch -a
+        run: git branch -a
