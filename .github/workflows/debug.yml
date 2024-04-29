@@ -14,8 +14,6 @@ jobs:
         run: ls -la
       - name: (before) pwd
         run: pwd
-      - name: (before) git branch -a
-        run: git branch -a
       - name: Checkout
         uses: actions/checkout@v4
       - name: (after) lsb_release -a
