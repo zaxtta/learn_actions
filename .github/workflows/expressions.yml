@@ -11,3 +11,5 @@ jobs:
       - name: contains true
         if: contains(fromJSON('["one", "two"]'), 'one')
         run: echo "true"
+      - name: format
+        run: format('Hello {0} {1}', 'Tom', 'World')
