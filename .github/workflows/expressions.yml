@@ -9,4 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: contains true
-        run: contains('Hello world', 'llo')
+        if: contains(fromJSON('["one", "two"]'), 'one')
+        run: echo "true"
+      - name: contains false
+        if: contains(["one", "two"], 'three')
+        run: echo "false"
