@@ -11,6 +11,3 @@ jobs:
       - name: contains true
         if: contains(fromJSON('["one", "two"]'), 'one')
         run: echo "true"
-      - name: contains false
-        if: contains(["one", "two"], 'three')
-        run: echo "false"
