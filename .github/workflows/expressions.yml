@@ -9,6 +9,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: contains true
-        run: contains(fromJSON('["one", "two"]'), 'one')
-      - name: contains false
-        run: contains(fromJSON('["one", "two"]'), 'three')
+        run: contains('Hello world', 'llo')
