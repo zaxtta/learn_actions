@@ -14,5 +14,18 @@ jobs:
       - name: format
         if: format('Hello {0} {1}', 'Tom', 'World') == 'Hello Tom World'
         run: echo 'Hello Tom World'
-      - name: format2
-        run: format('Hello {0} {1}', 'Tom', 'World') == 'Hello Tom World' && echo 'Hello World' || 'Not'
+  sample2:
+    name: sample 2
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - id: set-matrix
+        run: echo "matrix={\"include\":[{\"project\":\"foo\",\"config\":\"Debug\"}, {\"project\":\"bar\",\"config\":\"Release\"}]}" >> $GITHUB_OUTPUT
+  sample3:
+    needs: sample2
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{ fromJSON(needs.sample2.outputs.matrix) }}
+    steps:
+      - run: echo "Matrix - Project ${{ matrix.project }}, Config ${{ matrix.config }}"
