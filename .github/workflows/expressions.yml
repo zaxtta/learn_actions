@@ -12,4 +12,7 @@ jobs:
         if: contains(fromJSON('["one", "two"]'), 'one')
         run: echo "true"
       - name: format
-        run: format('Hello {0} {1}', 'Tom', 'World')
+        if: format('Hello {0} {1}', 'Tom', 'World') == 'Hello Tom World'
+        run: echo 'Hello Tom World'
+      - name: format2
+        run: format('Hello {0} {1}', 'Tom', 'World') == 'Hello Tom World' && echo 'Hello World' || 'Not'
