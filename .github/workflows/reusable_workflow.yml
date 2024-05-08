@@ -36,3 +36,6 @@ jobs:
       - name: stdout inputs.env 2
         if: ${{ inputs.env }} === 'prd'
         run: echo "inputs.env is 'prd'"
+      - name: stdout inputs.env 2
+        if: ${{ inputs.env }} === 'stg'
+        run: echo "inputs.env is 'stg'"

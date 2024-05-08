@@ -31,7 +31,7 @@ jobs:
       - get_current_time
     uses: ./.github/workflows/reusable_workflow.yml
     with:
-      env: "prd"
+      env: 'prd'
       current_time: ${{ needs.get_current_time.outputs.current_time }}
     secrets:
       ENVIRONMENTS_SECRET_1: ${{ secrets.ENVIRONMENTS_SECRET_1 }}
