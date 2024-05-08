@@ -31,11 +31,11 @@ jobs:
           echo ${{ inputs.env }}
           echo ${{ inputs.current_time }}
       - name: stdout inputs.env 1
-        if: ${{ inputs.env }} === "prd"
+        if: ${{ inputs.env }} == "prd"
         run: echo "inputs.env is \"prd\""
       - name: stdout inputs.env 2
-        if: ${{ inputs.env }} === 'prd'
+        if: ${{ inputs.env }} == 'prd'
         run: echo "inputs.env is 'prd'"
       - name: stdout inputs.env 2
-        if: ${{ inputs.env }} === 'stg'
+        if: ${{ inputs.env }} == 'stg'
         run: echo "inputs.env is 'stg'"
