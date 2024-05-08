@@ -1,0 +1,37 @@
+name: Reusable Workflow
+
+on:
+  workflow_call:
+    inputs:
+      env:
+        required: true
+        type: string
+      current_time:
+        required: true
+        type: string
+    secrets:
+      ENVIRONMENTS_SECRET_1:
+        required: true
+      ENVIRONMENTS_VARIABLE_1:
+        required: true
+      REPOSITORY_SECRETS_1:
+        required: true
+
+jobs:
+  process:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: echo secrets
+        run: |
+          echo ${{ secrets.ENVIRONMENTS_SECRET_1 }}
+          echo ${{ secrets.ENVIRONMENTS_VARIABLE_1 }}
+          echo ${{ secrets.REPOSITORY_SECRETS_1 }}
+          echo ${{ inputs.env }}
+          echo ${{ inputs.current_time }}
+      - name: stdout inputs.env 1
+        if: ${{ inputs.env }} === "prd"
+        run: echo "inputs.env is \"prd\""
+      - name: stdout inputs.env 2
+        if: ${{ inputs.env }} === 'prd'
+        run: echo "inputs.env is 'prd'"
