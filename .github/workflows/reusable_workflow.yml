@@ -20,6 +20,7 @@ on:
 jobs:
   process:
     runs-on: ubuntu-latest
+    environment: prd
     timeout-minutes: 5
     steps:
       - name: echo secrets
