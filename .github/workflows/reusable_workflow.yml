@@ -22,6 +22,13 @@ jobs:
     runs-on: ubuntu-latest
     environment: prd
     timeout-minutes: 5
+    strategy:
+      matrix:
+        include:
+          - song: jaz
+            my_path:
+              - from: "dist"
+                to: ${{ inputs.env == 'prd' && '' || format('{0}/', inputs.env) }}sub_dir
     steps:
       - name: echo secrets
         run: |
@@ -30,12 +37,13 @@ jobs:
           echo ${{ secrets.REPOSITORY_SECRETS_1 }}
           echo ${{ inputs.env }}
           echo ${{ inputs.current_time }}
-      - name: stdout inputs.env 1
-        if: ${{ inputs.env }} == "prd"
-        run: echo "inputs.env is \"prd\""
-      - name: stdout inputs.env 2
-        if: ${{ inputs.env }} == 'prd'
-        run: echo "inputs.env is 'prd'"
-      - name: stdout inputs.env 2
-        if: ${{ inputs.env }} == 'stg'
-        run: echo "inputs.env is 'stg'"
+      - name: matrix prcess
+        if: matrix.my_path
+        run: |
+          jq -c '.[]' <<< '${{ toJSON(matrix.my_path) }}' | while read -r path; do
+            from=$(echo $path | jq -r '.from')
+            to=$(echo $path | jq -r '.to')
+            echo ${{ matrix.song }}/${from}/xxx/${to}
+          done
+      - name: finish
+        run: echo 'finish!'
