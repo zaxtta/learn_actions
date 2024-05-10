@@ -18,8 +18,20 @@ on:
         required: true
 
 jobs:
+  get_dir:
+    runs-on: ubuntu-latest
+    outputs:
+      song_prefix: ${{ steps.my_s_id.outputs.song_prefix }}
+    steps:
+      - id: my_s_id
+        run: |
+          if [[ "${{ inputs.env }}" != "prd" ]]; then
+            echo "song_prefix=$(inputs.env)/" >> "$GITHUB_OUTPUT"
+          fi
   process:
     runs-on: ubuntu-latest
+    needs:
+      - get_dir
     environment: prd
     timeout-minutes: 5
     strategy:
@@ -28,7 +40,8 @@ jobs:
           - song: jaz
             my_path:
               - from: "dist"
-                to: ${{ inputs.env != 'prd' && format('{0}/', inputs.env) || '' }}sub_dir
+                to: ${{ needs.get_dir.outputs.song_prefix }}sub_dir
+                # to: ${{ inputs.env != 'prd' && format('{0}/', inputs.env) || '' }}sub_dir
                 # to: ${{ format('{0}', inputs.env == 'prd' && '' || inputs.env) }}sub_dir
     steps:
       - name: echo secrets
