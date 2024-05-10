@@ -48,3 +48,14 @@ jobs:
       ENVIRONMENTS_SECRET_1: ${{ secrets.ENVIRONMENTS_SECRET_1 }}
       ENVIRONMENTS_VARIABLE_1: ${{ secrets.ENVIRONMENTS_VARIABLE_1 }}
       REPOSITORY_SECRETS_1: ${{ secrets.REPOSITORY_SECRETS_1 }}
+  stg_process:
+    needs:
+      - get_current_time
+    uses: ./.github/workflows/reusable_workflow.yml
+    with:
+      env: "stg"
+      current_time: ${{ needs.get_current_time.outputs.current_time }}
+    secrets:
+      ENVIRONMENTS_SECRET_1: ${{ secrets.ENVIRONMENTS_SECRET_1 }}
+      ENVIRONMENTS_VARIABLE_1: ${{ secrets.ENVIRONMENTS_VARIABLE_1 }}
+      REPOSITORY_SECRETS_1: ${{ secrets.REPOSITORY_SECRETS_1 }}

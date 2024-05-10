@@ -28,7 +28,8 @@ jobs:
           - song: jaz
             my_path:
               - from: "dist"
-                to: ${{ format('{0}', inputs.env == 'prd' && '' || inputs.env) }}sub_dir
+                to: ${{ inputs.env != prd && format('{0}/', inputs.env) || '' }}sub_dir
+                # to: ${{ format('{0}', inputs.env == 'prd' && '' || inputs.env) }}sub_dir
     steps:
       - name: echo secrets
         run: |
