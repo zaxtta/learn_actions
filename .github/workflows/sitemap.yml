@@ -1,0 +1,63 @@
+name: Generate Sitemap
+
+on:
+  push:
+
+jobs:
+  get_articles:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      articles: ${{ steps.sorted_articles.outputs.articles }}
+    steps:
+      - id: sorted_articles
+        run: |
+          fetch_url=https://render-sample-1.onrender.com/articles
+          ameba_url=https://www.ameba.jp
+          page=1
+          per_page=3
+          res=$(curl -H "x-api-key: ${{ secrets.X_API_KEY }}" "${fetch_url}?page=${page}&per_page=${per_page}")
+          articles=$(echo $res | jq --arg ameba_url "$ameba_url" -c '.articles[] | [{url:"\($ameba_url)/\(.route)/\(.slug)/", refreshed_at: .refreshed_at}]')
+          total=$(echo $res | jq -r '.total')
+          max_page=$((($total + $per_page - 1) / $per_page))
+          for ((page=2; page<=max_page; page++)); do
+            res=$(curl -H "x-api-key: ${{ secrets.X_API_KEY }}" "${fetch_url}?page=${page}&per_page=${per_page}")
+            tmp_artices=$(echo $res | jq --arg ameba_url "$ameba_url" -c '.articles[] | [{url:"\($ameba_url)/\(.route)/\(.slug)/", refreshed_at: .refreshed_at}]')
+            articles=$(echo $articles $tmp_artices | jq -s -c add)
+          done
+          articles=$(echo $articles | jq -c 'sort_by(.refreshed_at) | reverse')
+          echo "articles=${articles}" >> "$GITHUB_OUTPUT"
+  get_users:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      users: ${{ steps.sorted_users.outputs.users }}
+    steps:
+      - id: sorted_users
+        run: |
+          fetch_url=https://render-sample-1.onrender.com/users
+          ameba_url=https://www.ameba.jp
+          page=1
+          per_page=3
+          res=$(curl -H "x-api-key: ${{ secrets.X_API_KEY }}" "${fetch_url}?page=${page}&per_page=${per_page}")
+          users=$(echo $res | jq --arg ameba_url "$ameba_url" -c '.users[] | [{url:"\($ameba_url)/users/\(.id)/", refreshed_at: .refreshed_at, articles: .articles}]')
+          total=$(echo $res | jq -r '.total')
+          max_page=$((($total + $per_page - 1) / $per_page))
+          for ((page=2; page<=max_page; page++)); do
+            res=$(curl -H "x-api-key: ${{ secrets.X_API_KEY }}" "${fetch_url}?page=${page}&per_page=${per_page}")
+            tmp_users=$(echo $res | jq --arg ameba_url "$ameba_url" -c '.users[] | [{url:"\($ameba_url)/users/\(.id)/", refreshed_at: .refreshed_at, articles: .articles}]')
+            users=$(echo $users $tmp_users | jq -s -c add)
+          done
+          users=$(echo $users | jq -c 'sort_by(.refreshed_at) | reverse')
+          echo "users=${users}" >> "$GITHUB_OUTPUT"
+  generate_sitemap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs:
+      - get_articles
+      - get_users
+    steps:
+      - name: generate sitemap
+        run: |
+          article_urls=$(echo ${{ toJSON(needs.get_articles.outputs.articles) }} | jq '.[] | .url')
+          users_urls=$(echo ${{ toJSON(needs.get_users.outputs.users) }} | jq '.[] | .url')
