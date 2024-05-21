@@ -117,4 +117,5 @@ jobs:
       #     fi
       - name: Create PR
         run: |
-          gh pr create --base main --head chore/sitemap_$(date + '%Y%m%d') --title "Update sitemap" --body "sitemap"
+          branch_name=chore/sitemap_$(date + '%Y%m%d')
+          gh pr create --base main --head $branch_name --title "Update sitemap" --body "sitemap"
