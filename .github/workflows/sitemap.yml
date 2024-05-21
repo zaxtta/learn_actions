@@ -12,17 +12,18 @@ jobs:
     steps:
       - id: sorted_articles
         run: |
+          set -e
           fetch_url=https://render-sample-1.onrender.com/articles
-          ameba_url=https://www.ameba.jp
+          example_url=https://example.com
           page=1
           per_page=3
-          res=$(curl -H "x-api-key: ${{ secrets.X_API_KEY }}" "${fetch_url}?page=${page}&per_page=${per_page}")
-          articles=$(echo $res | jq --arg ameba_url "$ameba_url" -c '.articles[] | [{url:"\($ameba_url)/\(.route)/\(.slug)/", refreshed_at: .refreshed_at}]')
+          res=$(curl -fSsL -H "x-api-key: ${{ secrets.X_API_KEY }}" "${fetch_url}?page=${page}&per_page=${per_page}")
+          articles=$(echo $res | jq --arg example_url "$example_url" -c '.articles[] | [{url:"\($example_url)/\(.route)/\(.slug)/", refreshed_at: .refreshed_at}]')
           total=$(echo $res | jq -r '.total')
           max_page=$((($total + $per_page - 1) / $per_page))
           for ((page=2; page<=max_page; page++)); do
-            res=$(curl -H "x-api-key: ${{ secrets.X_API_KEY }}" "${fetch_url}?page=${page}&per_page=${per_page}")
-            tmp_artices=$(echo $res | jq --arg ameba_url "$ameba_url" -c '.articles[] | [{url:"\($ameba_url)/\(.route)/\(.slug)/", refreshed_at: .refreshed_at}]')
+            res=$(curl -fSsL -H "x-api-key: ${{ secrets.X_API_KEY }}" "${fetch_url}?page=${page}&per_page=${per_page}")
+            tmp_artices=$(echo $res | jq --arg example_url "$example_url" -c '.articles[] | [{url:"\($example_url)/\(.route)/\(.slug)/", refreshed_at: .refreshed_at}]')
             articles=$(echo $articles $tmp_artices | jq -s -c add)
           done
           articles=$(echo $articles | jq -c 'sort_by(.refreshed_at) | reverse')
@@ -35,17 +36,20 @@ jobs:
     steps:
       - id: sorted_users
         run: |
+          set -e
           fetch_url=https://render-sample-1.onrender.com/users
-          ameba_url=https://www.ameba.jp
+          example_url=https://example.com
           page=1
           per_page=3
-          res=$(curl -H "x-api-key: ${{ secrets.X_API_KEY }}" "${fetch_url}?page=${page}&per_page=${per_page}")
-          users=$(echo $res | jq --arg ameba_url "$ameba_url" -c '.users[] | [{url:"\($ameba_url)/users/\(.id)/", refreshed_at: .refreshed_at, articles: .articles}]')
+          res=$(curl -fSsL -H "x-api-key: ${{ secrets.X_API_KEY }}" "${fetch_url}?page=${page}&per_page=${per_page}")
+          users=$(echo $res | jq '.users |= map(select(.articles | length > 0))' | jq --arg example_url "$example_url" -c '.users[] | [{url:"\($example_url)/users/\(.id)/", refreshed_at: .refreshed_at}]')
+          # users=$(echo $res | jq --arg example_url "$example_url" -c '.users[] | [{url:"\($example_url)/users/\(.id)/", refreshed_at: .refreshed_at, articles: .articles}]')
           total=$(echo $res | jq -r '.total')
           max_page=$((($total + $per_page - 1) / $per_page))
           for ((page=2; page<=max_page; page++)); do
-            res=$(curl -H "x-api-key: ${{ secrets.X_API_KEY }}" "${fetch_url}?page=${page}&per_page=${per_page}")
-            tmp_users=$(echo $res | jq --arg ameba_url "$ameba_url" -c '.users[] | [{url:"\($ameba_url)/users/\(.id)/", refreshed_at: .refreshed_at, articles: .articles}]')
+            res=$(curl -fSsL -H "x-api-key: ${{ secrets.X_API_KEY }}" "${fetch_url}?page=${page}&per_page=${per_page}")
+            tmp_users=$(echo $res | jq '.users |= map(select(.articles | length > 0))' | jq --arg example_url "$example_url" -c '.users[] | [{url:"\($example_url)/users/\(.id)/", refreshed_at: .refreshed_at}]')
+            # tmp_users=$(echo $res | jq --arg example_url "$example_url" -c '.users[] | [{url:"\($example_url)/users/\(.id)/", refreshed_at: .refreshed_at, articles: .articles}]')
             users=$(echo $users $tmp_users | jq -s -c add)
           done
           users=$(echo $users | jq -c 'sort_by(.refreshed_at) | reverse')
@@ -61,3 +65,5 @@ jobs:
         run: |
           article_urls=$(echo ${{ toJSON(needs.get_articles.outputs.articles) }} | jq '.[] | .url')
           users_urls=$(echo ${{ toJSON(needs.get_users.outputs.users) }} | jq '.[] | .url')
+          echo $article_urls
+          echo $users_urls
