@@ -72,23 +72,20 @@ jobs:
         run: |
           article_urls=$(echo ${{ toJSON(needs.get_articles.outputs.articles) }} | jq '.[] | .url')
           users_urls=$(echo ${{ toJSON(needs.get_users.outputs.users) }} | jq '.[] | .url')
-          other_urls=("https://ex.com/top" "https://ex.com/" "https://ex.com/own/")
+          other_urls=("https://ex.com/top/" "https://ex.com/" "https://ex.com/own/")
           sitemap="<?xml version="1.0" encoding="UTF-8"?>\n"
           sitemap+="<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n"
-          for url in $article_urls
-          do
+          for url in $article_urls; do
             sitemap+="  <url>\n"
             sitemap+="    <loc>${url}</loc>"
             sitemap+="  </url>\n"
           done
-          for url in $users_urls
-          do
+          for url in $users_urls; do
             sitemap+="  <url>\n"
             sitemap+="    <loc>${url}</loc>"
             sitemap+="  </url>\n"
           done
-          for url in $other_urls
-          do
+          for url in $other_urls; do
             sitemap+="  <url>\n"
             sitemap+="    <loc>${url}</loc>"
             sitemap+="  </url>\n"
@@ -110,7 +107,7 @@ jobs:
             echo "branch_name=${branch_name}" >> "$GITHUB_OUTPUT"
           else
             echo "No change to commit"
-            exit 0
+            exit 1
           fi
       - name: Create PR
         run: |
