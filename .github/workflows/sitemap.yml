@@ -1,5 +1,8 @@
 name: Generate Sitemap
 
+env:
+  TZ: Asia/Tokyo
+
 on:
   push:
 
@@ -43,13 +46,11 @@ jobs:
           per_page=3
           res=$(curl -fSsL -H "x-api-key: ${{ secrets.X_API_KEY }}" "${fetch_url}?page=${page}&per_page=${per_page}")
           users=$(echo $res | jq '.users |= map(select(.articles | length > 0))' | jq --arg example_url "$example_url" -c '.users[] | [{url:"\($example_url)/users/\(.id)/", refreshed_at: .refreshed_at}]')
-          # users=$(echo $res | jq --arg example_url "$example_url" -c '.users[] | [{url:"\($example_url)/users/\(.id)/", refreshed_at: .refreshed_at, articles: .articles}]')
           total=$(echo $res | jq -r '.total')
           max_page=$((($total + $per_page - 1) / $per_page))
           for ((page=2; page<=max_page; page++)); do
             res=$(curl -fSsL -H "x-api-key: ${{ secrets.X_API_KEY }}" "${fetch_url}?page=${page}&per_page=${per_page}")
             tmp_users=$(echo $res | jq '.users |= map(select(.articles | length > 0))' | jq --arg example_url "$example_url" -c '.users[] | [{url:"\($example_url)/users/\(.id)/", refreshed_at: .refreshed_at}]')
-            # tmp_users=$(echo $res | jq --arg example_url "$example_url" -c '.users[] | [{url:"\($example_url)/users/\(.id)/", refreshed_at: .refreshed_at, articles: .articles}]')
             users=$(echo $users $tmp_users | jq -s -c add)
           done
           users=$(echo $users | jq -c 'sort_by(.refreshed_at) | reverse')
@@ -60,10 +61,57 @@ jobs:
     needs:
       - get_articles
       - get_users
+    permissions:
+      contents: write
+      pull-requests: write
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
+      - uses: actions/checkout@v4
       - name: generate sitemap
         run: |
           article_urls=$(echo ${{ toJSON(needs.get_articles.outputs.articles) }} | jq '.[] | .url')
           users_urls=$(echo ${{ toJSON(needs.get_users.outputs.users) }} | jq '.[] | .url')
-          echo $article_urls
-          echo $users_urls
+          other_urls=("https://ex.com/top" "https://ex.com/" "https://ex.com/own/")
+          sitemap="<?xml version="1.0" encoding="UTF-8"?>\n"
+          sitemap+="<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n"
+          for url in $article_urls
+          do
+            sitemap+="  <url>\n"
+            sitemap+="    <loc>${url}</loc>"
+            sitemap+="  </url>\n"
+          done
+          for url in $users_urls
+          do
+            sitemap+="  <url>\n"
+            sitemap+="    <loc>${url}</loc>"
+            sitemap+="  </url>\n"
+          done
+          for url in $other_urls
+          do
+            sitemap+="  <url>\n"
+            sitemap+="    <loc>${url}</loc>"
+            sitemap+="  </url>\n"
+          done
+          sitemap+="</urlset>"
+          echo $sitemap
+          echo -e $sitemap > ./apps/web/public/sitemap.xml
+      - name: Commit
+        id: sitemap_commit
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          if ! git diff --quiet; then
+            branch_name=chore/sitemap_$(date + '%Y%m%d')
+            git checkout -b $branch_name
+            git commit -m "chore: update sitemap"
+            git push origin $branch_name
+            echo "branch_name=${branch_name}" >> "$GITHUB_OUTPUT"
+          else
+            echo "No change to commit"
+            exit 0
+          fi
+      - name: Create PR
+        run: |
+          gh pr create --base main --head ${{ steps.sitemap_commit.outputs.branch_name }} --title "Update sitemap" --body "sitemap"
