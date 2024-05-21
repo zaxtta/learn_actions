@@ -78,24 +78,24 @@ jobs:
           sitemap="<?xml version="1.0" encoding="UTF-8"?>\n"
           sitemap+="<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n"
           for url in $article_urls; do
-            sitemap+="  <url>\n"
-            sitemap+="    <loc>${url}</loc>\n"
-            sitemap+="  </url>\n"
+            sitemap+="\t<url>\n"
+            sitemap+="\t\t<loc>${url}</loc>\n"
+            sitemap+="\t</url>\n"
           done
           for url in $users_urls; do
-            sitemap+="  <url>\n"
-            sitemap+="    <loc>${url}</loc>\n"
-            sitemap+="  </url>\n"
+            sitemap+="\t<url>\n"
+            sitemap+="\t\t<loc>${url}</loc>\n"
+            sitemap+="\t</url>\n"
           done
           for url in $other_urls; do
-            sitemap+="  <url>\n"
-            sitemap+="    <loc>${url}</loc>\n"
-            sitemap+="  </url>\n"
+            sitemap+="\t<url>\n"
+            sitemap+="\t\t<loc>${url}</loc>\n"
+            sitemap+="\t</url>\n"
           done
           sitemap+="</urlset>"
           echo "$(pwd)/apps/web/public/sitemap.xml"
           echo "${sitemap}"
-          echo -e $sitemap > "$(pwd)/apps/web/public/sitemap.xml"
+          echo -e $sitemap > ./apps/web/public/sitemap.xml
       - name: Commit
         id: sitemap_commit
         run: |
