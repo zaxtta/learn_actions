@@ -118,4 +118,5 @@ jobs:
       - name: Create PR
         run: |
           branch_name=chore/sitemap_$(date +'%Y%m%d')
+          git push origin $branch_name
           gh pr create --base main --head $branch_name --title "Update sitemap" --body "sitemap"
