@@ -93,7 +93,9 @@ jobs:
             sitemap+="  </url>\n"
           done
           sitemap+="</urlset>"
-          echo -e $sitemap > ./apps/web/public/sitemap.xml
+          echo "$(pwd)/apps/web/public/sitemap.xml"
+          echo "${sitemap}"
+          echo -e $sitemap > "$(pwd)/apps/web/public/sitemap.xml"
       - name: Commit
         id: sitemap_commit
         run: |
