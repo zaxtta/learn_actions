@@ -117,4 +117,4 @@ jobs:
       #     fi
       - name: Create PR
         run: |
-          gh pr create --base main --head ${{ steps.sitemap_commit.outputs.branch_name }} --title "Update sitemap" --body "sitemap"
+          gh pr create --base main --head chore/sitemap_$(date + '%Y%m%d') --title "Update sitemap" --body "sitemap"
