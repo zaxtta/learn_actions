@@ -73,8 +73,8 @@ jobs:
           token: ${{ secrets.REPO_AND_WORKFLOW_PAT }}
       - name: generate sitemap
         run: |
-          article_urls=$(echo ${{ toJSON(needs.get_articles.outputs.articles) }} | jq '.[] | .url')
-          users_urls=$(echo ${{ toJSON(needs.get_users.outputs.users) }} | jq '.[] | .url')
+          article_urls=$(echo ${{ toJSON(needs.get_articles.outputs.articles) }} | jq -r '.[] | .url')
+          users_urls=$(echo ${{ toJSON(needs.get_users.outputs.users) }} | jq -r '.[] | .url')
           other_urls=("https://ex.com/top/" "https://ex.com/" "https://ex.com/own/")
           sitemap="<?xml version="1.0" encoding="UTF-8"?>\n"
           sitemap+="<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n"
