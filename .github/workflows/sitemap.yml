@@ -68,6 +68,8 @@ jobs:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: generate sitemap
         run: |
           article_urls=$(echo ${{ toJSON(needs.get_articles.outputs.articles) }} | jq '.[] | .url')
@@ -77,21 +79,20 @@ jobs:
           sitemap+="<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n"
           for url in $article_urls; do
             sitemap+="  <url>\n"
-            sitemap+="    <loc>${url}</loc>"
+            sitemap+="    <loc>${url}</loc>\n"
             sitemap+="  </url>\n"
           done
           for url in $users_urls; do
             sitemap+="  <url>\n"
-            sitemap+="    <loc>${url}</loc>"
+            sitemap+="    <loc>${url}</loc>\n"
             sitemap+="  </url>\n"
           done
           for url in $other_urls; do
             sitemap+="  <url>\n"
-            sitemap+="    <loc>${url}</loc>"
+            sitemap+="    <loc>${url}</loc>\n"
             sitemap+="  </url>\n"
           done
           sitemap+="</urlset>"
-          echo $sitemap
           echo -e $sitemap > ./apps/web/public/sitemap.xml
       - name: Commit
         id: sitemap_commit
