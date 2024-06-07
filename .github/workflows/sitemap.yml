@@ -18,14 +18,12 @@ jobs:
         with:
           result-encoding: json
           script: |
-            const fetchUrl = "https://render-sample-1.onrender.com/articles";
             const exampleUrl = "https://example.com";
-            const result = [];
             const perPage = 3;
-            let page = 1;
             let maxPage = 1;
-            for (let i = 0; i < maxPage; i += 1) {
-              const res = await fetch(`${fetchUrl}?page=${page}&per_page=${perPage}`, {
+            let result = [];
+            for (let page = 1; page <= maxPage; page += 1) {
+              const res = await fetch(`https://render-sample-1.onrender.com/articles?page=${page}&per_page=${perPage}`, {
                 headers: {
                   "Content-Type": "application/json",
                   "x-api-key": "${{ secrets.X_API_KEY }}"
@@ -35,19 +33,64 @@ jobs:
                 throw new Error(res.text)
               }
               const resJson = await res.json();
-              const data = resJson.articles.map((article) => {
+              result = resJson.articles.reduce((acc, cur) => {
                 return {
                   url: `${exampleUrl}/${article.route}/${article.slug}/`,
                   refreshed_at: article.refreshed_at
                 }
-              })
-              result.push(...data)
+              }, result);
               maxPage = (resJson.total + perPage - 1) / perPage;
             }
             result.sort((a, b) => {
               return new Date(b.refreshed_at) - new Date(a.refreshed_at);
             })
             return result;
-      - name: get result
-        run: echo "${{ steps.sorted_articles.outputs.result }}"
-  
+  get_users:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      users: ${{ steps.sorted_users.outputs.users }}
+    steps:
+      - uses: actions/github-script@v7
+        id: sorted_users
+        with:
+          result-encoding: json
+          script: |
+            const exampleUrl = "https://example.com";
+            const perPage = 3;
+            let maxPage = 1;
+            let result = [];
+            for (let page = 1; page <= maxPage; page += 1) {
+              const res = await fetch(`https://render-sample-1.onrender.com/users?page=${page}&per_page=${perPage}`, {
+                headers: {
+                  "Content-Type": "application/json",
+                  "x-api-key": "${{ secrets.X_API_KEY }}"
+                }
+              });
+              if (!res.ok) {
+                throw new Error(res.text)
+              }
+              const resJson = await res.json();
+              result = resJson.articles.reduce((acc, cur) => {
+                return {
+                  url: `${exampleUrl}/${article.route}/${article.slug}/`,
+                  refreshed_at: article.refreshed_at
+                }
+              }, result);
+              maxPage = (resJson.total + perPage - 1) / perPage;
+            }
+            result.sort((a, b) => {
+              return new Date(b.refreshed_at) - new Date(a.refreshed_at);
+            })
+            return result;
+  show_results:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs:
+      - get_articles
+      - get_users
+    steps:
+      - name: echo results
+        run: |
+          echo ${{ needs.get_articles.outputs.articles }}
+          echo ${{ needs.get_users.outputs.users }}
