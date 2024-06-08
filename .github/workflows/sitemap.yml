@@ -35,7 +35,7 @@ jobs:
               const resJson = await res.json();
               result = resJson.articles.reduce((acc, cur) => {
                 return [
-                  ..acc,
+                  ...acc,
                   {
                     url: `${exampleUrl}/${cur.route}/${cur.slug}/`,
                     refreshed_at: cur.refreshed_at
@@ -93,9 +93,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     needs:
-      # - get_articles
+      - get_articles
       - get_users
     steps:
       - name: echo results
         run: |
+          echo ${{ needs.get_articles.outputs.articles }}
           echo ${{ needs.get_users.outputs.users }}
