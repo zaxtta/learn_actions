@@ -74,11 +74,11 @@ jobs:
                 throw new Error(res.text)
               }
               const resJson = await res.json();
-              result = resJson.articles.reduce((acc, cur) => {
+              result = resJson.users.reduce((acc, cur) => {
                 return [
                   ...acc,
                   {
-                    url: `${exampleUrl}/${cur.route}/${cur.slug}/`,
+                    url: `${exampleUrl}/${cur.id}/`,
                     refreshed_at: cur.refreshed_at
                   }
                 ]
