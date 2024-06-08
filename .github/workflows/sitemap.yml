@@ -93,10 +93,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     needs:
-      - get_articles
+      # - get_articles
       - get_users
     steps:
       - name: echo results
         run: |
-          echo ${{ needs.get_articles.outputs.articles }}
           echo ${{ needs.get_users.outputs.users }}
