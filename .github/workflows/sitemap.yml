@@ -10,8 +10,6 @@ jobs:
   get_articles:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    outputs:
-      articles: ${{ steps.sorted_articles.outputs.articles }}
     steps:
       - uses: actions/github-script@v7
         id: sorted_articles
@@ -47,12 +45,12 @@ jobs:
             result.sort((a, b) => {
               return new Date(b.refreshed_at) - new Date(a.refreshed_at);
             })
-            echo "articles=${result}" >> $GITHUB_OUTPUT
+            return result;
+      - name: export result
+        run: echo "articles=${{ steps.sorted_articles.outputs.articles }}" >> "$GITHUB_OUTPUT"
   get_users:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    outputs:
-      users: ${{ steps.sorted_users.outputs.users }}
     steps:
       - uses: actions/github-script@v7
         id: sorted_users
@@ -88,7 +86,9 @@ jobs:
             result.sort((a, b) => {
               return new Date(b.refreshed_at) - new Date(a.refreshed_at);
             })
-            echo "users=${result}" >> $GITHUB_OUTPUT
+            return result;
+      - name: export result
+        run: echo "users=${{ steps.sorted_users.outputs.users }}" >> "$GITHUB_OUTPUT"
   show_results:
     runs-on: ubuntu-latest
     timeout-minutes: 10
