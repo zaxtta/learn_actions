@@ -34,10 +34,13 @@ jobs:
               }
               const resJson = await res.json();
               result = resJson.articles.reduce((acc, cur) => {
-                return {
-                  url: `${exampleUrl}/${article.route}/${article.slug}/`,
-                  refreshed_at: article.refreshed_at
-                }
+                return [
+                  ..acc,
+                  {
+                    url: `${exampleUrl}/${cur.route}/${cur.slug}/`,
+                    refreshed_at: cur.refreshed_at
+                  }
+                ]
               }, result);
               maxPage = (resJson.total + perPage - 1) / perPage;
             }
@@ -72,10 +75,13 @@ jobs:
               }
               const resJson = await res.json();
               result = resJson.articles.reduce((acc, cur) => {
-                return {
-                  url: `${exampleUrl}/${article.route}/${article.slug}/`,
-                  refreshed_at: article.refreshed_at
-                }
+                return [
+                  ...acc,
+                  {
+                    url: `${exampleUrl}/${cur.route}/${cur.slug}/`,
+                    refreshed_at: cur.refreshed_at
+                  }
+                ]
               }, result);
               maxPage = (resJson.total + perPage - 1) / perPage;
             }
