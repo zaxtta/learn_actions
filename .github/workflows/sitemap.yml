@@ -115,11 +115,7 @@ jobs:
             const result = [];
 
             for (const url of targetUrls) {
-              const res = await fetch(url);
-              # if (res.ok) {
-              #   result.push(url);
-              # }
-              result.push(url);          
+              result.push(url);
             }
 
             console.log(result);
