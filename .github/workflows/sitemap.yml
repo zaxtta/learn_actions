@@ -128,8 +128,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: |
+          embed_urls=${{ needs.extract_exists_urls.outputs.urls }}
           str="<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n"
-          for url in $(${{ needs.extract_exists_urls.outputs.urls }} | jq .); do
+          for url in ${embed_urls//,/}; do
             str+="  <url>\n    <loc>${url}</loc>\n  </url>\n"
           done
           str+="</urlset>"
