@@ -138,4 +138,17 @@ jobs:
             str += "</urlset>";
 
             fs.writeFileSync("apps/web/public/sitemap.xml", str, "utf8");
-      - run: cat apps/web/public/sitemap.xml
+      - name: Check Sitemap Output
+        run: cat apps/web/public/sitemap.xml
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.REPO_AND_WORKFLOW_PAT }}
+          commit-message: Upage Sitemap
+          committer: github-actions[bot] <github-actions[bot]@users.noreply.github.com>
+          author: ${{ github.actor }} <${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com>
+          branch: feat/siteamp
+          delete-branch: true
+          title: '[bot] Update sitemap'
+          body: |
+            if ok, please merge.
