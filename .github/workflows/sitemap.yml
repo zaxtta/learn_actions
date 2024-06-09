@@ -89,14 +89,21 @@ jobs:
               return new Date(b.refreshed_at) - new Date(a.refreshed_at);
             })
             return result;
-  show_results:
+  extract_exists_urls:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     needs:
       - get_articles
       - get_users
+    outputs:
+      users: ${{ steps.exists_urls.outputs.result }}
     steps:
-      - name: echo results
-        run: |
-          echo ${{ needs.get_articles.outputs.articles }}
-          echo ${{ needs.get_users.outputs.users }}
+      - uses: actions/github-script@v7
+        id: exists_urls
+        with:
+          result-encoding: json
+          script: |
+            const articles = ${{ needs.get_articles.outputs.articles }};
+            const users = ${{ needs.get_users.outputs.users }};
+            console.log(articles);
+            console.log(users);
