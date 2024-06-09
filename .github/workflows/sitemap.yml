@@ -110,21 +110,21 @@ jobs:
               "https://example.com/",
               "https://example.com/news/about/"
             ];
-            const existsArticles = articles.map(async (article) => {
+            const existsArticles = await articles.map(async (article) => {
               const url = article.url;
               const res = await fetch(url);
               if (res.ok) {
                 return url;
               }
             }).filter(Boolean);
-            const existsUsers = users.map(async (user) => {
+            const existsUsers = await users.map(async (user) => {
               const url = user.url;
               const res = await fetch(url);
               if (res.ok) {
                 return url;
               }
             }).filter(Boolean);
-            const existsDefaults = defaults.map(async (url) => {
+            const existsDefaults = await defaults.map(async (url) => {
               const res = await fetch(url);
               if (res.ok) {
                 return url;
