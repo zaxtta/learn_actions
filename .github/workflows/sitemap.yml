@@ -106,4 +106,4 @@ jobs:
             const articles = ${{ needs.get_articles.outputs.articles }};
             const users = ${{ needs.get_users.outputs.users }};
             console.log(articles[0].url);
-            console.log(fromJSON(users)[0].url);
+            console.log(users[0].url);
