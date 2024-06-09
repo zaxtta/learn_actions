@@ -135,7 +135,7 @@ jobs:
             for (const url of ${{ needs.extract_exists_urls.outputs.urls }}) {
               str += `  <url>\n    <loc>${url}</loc>\n  </url>\n`;
             }
-            str += "</urlset>";
+            str += "</urlset>\n";
 
             fs.writeFileSync("apps/web/public/sitemap.xml", str, "utf8");
       - name: Check Sitemap Output
@@ -146,7 +146,7 @@ jobs:
           token: ${{ secrets.REPO_AND_WORKFLOW_PAT }}
           commit-message: Upage Sitemap
           committer: github-actions[bot] <github-actions[bot]@users.noreply.github.com>
-          author: ${{ github.actor }} <${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com>
+          author: github-actions[bot] <github-actions[bot]@users.noreply.github.com>
           branch: feat/siteamp
           delete-branch: true
           title: '[bot] Update sitemap'
