@@ -116,9 +116,10 @@ jobs:
 
             for (const url of targetUrls) {
               const res = await fetch(url);
-              if (res.ok) {
-                result.push(url);
-              }            
+              # if (res.ok) {
+              #   result.push(url);
+              # }
+              result.push(url);          
             }
 
             console.log(result);
@@ -132,7 +133,7 @@ jobs:
       - uses: actions/checkout@v4
       - run: |
           str="<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n"
-          for url in ${{ needs.extract_exists_urls.outputs.urls }}; do
+          for url in "${{ needs.extract_exists_urls.outputs.urls }}[@]"; do
             str+="  <url>\n    <loc>${url}</loc>\n  </url>\n"
           done
           str+="</urlset>"
