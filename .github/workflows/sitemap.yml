@@ -131,11 +131,11 @@ jobs:
           script: |
             const fs = require("fs");
             
-            let str = "<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n"
+            let str = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n"
             for (const url of ${{ needs.extract_exists_urls.outputs.urls }}) {
-              str += "  <url>\n    <loc>https://google.com/home/</loc>\n  </url>";
+              str += "  <url>\n    <loc>${url}</loc>\n  </url>";
             }
             str += "</urlset>";
 
-            fs.writeFileSync("apps/web/public/sitemap.xml", str)
+            fs.writeFileSync("apps/web/public/sitemap.xml", str, "utf8");
       - run: cat apps/web/public/sitemap.xml
