@@ -118,7 +118,6 @@ jobs:
               result.push(url);
             }
 
-            console.log(result);
             return result;
   generate_sitemap:
     runs-on: ubuntu-latest
@@ -127,12 +126,16 @@ jobs:
       - extract_exists_urls
     steps:
       - uses: actions/checkout@v4
-      - run: |
-          urls=$(echo '${{ needs.extract_exists_urls.outputs.urls }}' | jq .)
-          str="<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n"
-          for url in "${urls[@]}"; do
-            str+="  <url>\n    <loc>${url}</loc>\n  </url>\n"
-          done
-          str+="</urlset>"
-          echo -e ${str} > apps/web/public/sitemap.xml
-          cat apps/web/public/sitemap.xml
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require("fs");
+            
+            let str = "<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n"
+            for (const url of ${{ needs.extract_exists_urls.outputs.urls }}) {
+              str += "  <url>\n    <loc>https://google.com/home/</loc>\n  </url>";
+            }
+            str += "</urlset>";
+
+            fs.writeFileSync("apps/web/public/sitemap.xml", str)
+      - run: cat apps/web/public/sitemap.xml
