@@ -144,3 +144,4 @@ jobs:
           done
           str+="</urlset>"
           echo ${str} > apps/web/public/sitemap.xml
+          cat apps/web/public/sitemap.xml
