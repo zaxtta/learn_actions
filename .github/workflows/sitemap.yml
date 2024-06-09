@@ -110,27 +110,29 @@ jobs:
               "https://example.com/",
               "https://example.com/news/about/"
             ];
-            const existsArticles = articles.map((article) => {
+            const existsArticles = articles.map(async (article) => {
               const url = article.url;
               const res = await fetch(url);
               if (res.ok) {
                 return url;
               }
             }).filter(Boolean);
-            const existsUsers = users.map((user) => {
+            const existsUsers = users.map(async (user) => {
               const url = user.url;
               const res = await fetch(url);
               if (res.ok) {
                 return url;
               }
             }).filter(Boolean);
-            const existsDefaults = defaults.map((url) => {
+            const existsDefaults = defaults.map(async (url) => {
               const res = await fetch(url);
               if (res.ok) {
                 return url;
               }
             }).filter(Boolean);
-            return [...existsArticles, ...existsUsers, ...existsDefaults];
+            const result = [...existsArticles, ...existsUsers, ...existsDefaults];
+            console.log(result);
+            return result;
   generate_sitemap:
     runs-on: ubuntu-latest
     timeout-minutes: 10
